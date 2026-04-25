@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Löydä sopiva lean-koulutus — NPI</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --green-dark: #0f3d28;
+  --green-mid: #1a5c3a;
+  --green-light: #2d7a50;
+  --accent: #c8e6a0;
+  --accent-dark: #7ab648;
+  --text: #1a1a18;
+  --text-muted: #5a5a52;
+  --text-light: #8a8a80;
+  --bg: #f7f5ef;
+  --card-bg: #ffffff;
+  --border: rgba(0,0,0,0.09);
+  --border-strong: rgba(0,0,0,0.18);
+  --radius: 14px;
+  --radius-sm: 8px;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 16px 60px;
+}
+
+header {
+  width: 100%;
+  max-width: 680px;
+  padding: 28px 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 40px;
+}
+
+.logo-mark {
+  width: 36px;
+  height: 36px;
+  background: var(--green-mid);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-mark span {
+  color: var(--accent);
+  font-family: 'DM Serif Display', serif;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.logo-text {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--green-dark);
+  text-transform: uppercase;
+}
+
+.logo-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+
+.quiz-container {
+  width: 100%;
+  max-width: 680px;
+}
+
+.progress-bar-wrap {
+  height: 3px;
+  background: var(--border);
+  border-radius: 2px;
+  margin-bottom: 40px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: var(--green-mid);
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+.step { display: none; animation: fadeIn 0.3s ease; }
+.step.active { display: block; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.step-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--green-mid);
+  background: rgba(26,92,58,0.08);
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-bottom: 16px;
+}
+
+.q-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 30px;
+  color: var(--green-dark);
+  line-height: 1.2;
+  margin-bottom: 10px;
+}
+
+.q-sub {
+  font-size: 15px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 28px;
+  max-width: 520px;
+}
+
+.options-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+  margin-bottom: 32px;
+}
+
+.options-grid.two-col {
+  grid-template-columns: repeat(2, 1fr);
+  max-width: 400px;
+}
+
+.opt-card {
+  background: var(--card-bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.opt-card:hover {
+  border-color: var(--green-light);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(26,92,58,0.08);
+}
+
+.opt-card.selected {
+  border-color: var(--green-mid);
+  border-width: 2px;
+  background: rgba(26,92,58,0.03);
+}
+
+.check-dot {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-strong);
+  background: transparent;
+  transition: all 0.15s;
+}
+
+.opt-card.selected .check-dot {
+  background: var(--green-mid);
+  border-color: var(--green-mid);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.opt-card.selected .check-dot::after {
+  content: '';
+  width: 5px;
+  height: 9px;
+  border: 2px solid white;
+  border-top: none;
+  border-left: none;
+  transform: rotate(45deg) translate(-1px, -1px);
+  display: block;
+}
+
+.opt-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.3;
+  padding-right: 24px;
+}
+
+.opt-desc {
+  font-size: 12px;
+  color: var(--text-light);
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+.btn-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 8px;
+}
+
+.btn-primary {
+  background: var(--green-mid);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 12px 28px;
+  font-size: 15px;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  letter-spacing: 0.01em;
+}
+
+.btn-primary:hover { background: var(--green-light); transform: translateY(-1px); }
+.btn-primary:active { transform: scale(0.98); }
+.btn-primary:disabled { background: #c0c0b8; cursor: default; transform: none; }
+
+.btn-back {
+  background: transparent;
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 12px 20px;
+  font-size: 14px;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-back:hover { border-color: var(--green-mid); color: var(--green-mid); }
+
+.form-group { margin-bottom: 16px; }
+
+.form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  letter-spacing: 0.02em;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 15px;
+  font-family: 'DM Sans', sans-serif;
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--card-bg);
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.form-group input:focus,
+.form-group select:focus { border-color: var(--green-mid); }
+
+.loader-wrap {
+  text-align: center;
+  padding: 48px 0;
+}
+
+.loader-ring {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border);
+  border-top-color: var(--green-mid);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 16px;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loader-text {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.result-header {
+  margin-bottom: 28px;
+}
+
+.result-card {
+  background: var(--card-bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px 28px;
+  margin-bottom: 14px;
+}
+
+.result-card.featured {
+  border-color: var(--green-mid);
+  border-width: 2px;
+  background: rgba(26,92,58,0.02);
+}
+
+.result-card-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--green-mid);
+  margin-bottom: 8px;
+}
+
+.result-card h3 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 22px;
+  color: var(--green-dark);
+  margin-bottom: 10px;
+}
+
+.result-card p {
+  font-size: 15px;
+  color: var(--text-muted);
+  line-height: 1.65;
+}
+
+.cta-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 28px;
+  flex-wrap: wrap;
+}
+
+.btn-cta {
+  background: var(--green-mid);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 13px 28px;
+  font-size: 15px;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  transition: background 0.15s;
+}
+
+.btn-cta:hover { background: var(--green-light); }
+
+.btn-cta-secondary {
+  background: transparent;
+  color: var(--green-mid);
+  border: 1.5px solid var(--green-mid);
+  border-radius: var(--radius-sm);
+  padding: 13px 28px;
+  font-size: 15px;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.15s;
+}
+
+.btn-cta-secondary:hover { background: rgba(26,92,58,0.05); }
+
+.email-note {
+  font-size: 12px;
+  color: var(--text-light);
+  margin-top: 16px;
+}
+
+.test-banner {
+  width: 100%;
+  max-width: 680px;
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: var(--radius-sm);
+  padding: 10px 16px;
+  font-size: 13px;
+  color: #856404;
+  margin-bottom: 24px;
+  text-align: center;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-mark"><span>N</span></div>
+  <div>
+    <div class="logo-text">NPI</div>
+    <div class="logo-sub">Nordic Process Improvement</div>
+  </div>
+</header>
+
+<div class="quiz-container">
+
+  <div class="test-banner">⚠️ Tämä on testiversio — ei julkinen. Kokeile vapaasti ja anna palautetta.</div>
+
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="progress-fill" style="width: 25%"></div>
+  </div>
+
+  <!-- Step 1 -->
+  <div class="step active" id="step-1">
+    <div class="step-badge">Vaihe 1 / 4</div>
+    <h1 class="q-title">Löydä sinulle sopiva lean-koulutus</h1>
+    <p class="q-sub">Mitä haluaisit saavuttaa? Voit valita useamman vaihtoehdon.</p>
+    <div class="options-grid" id="goals-grid"></div>
+    <div class="btn-row">
+      <div></div>
+      <button class="btn-primary" id="btn1" onclick="goTo(2)" disabled>Eteenpäin →</button>
+    </div>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="step" id="step-2">
+    <div class="step-badge">Vaihe 2 / 4</div>
+    <h2 class="q-title">Aiempi lean-kokemus</h2>
+    <p class="q-sub">Onko sinulla aikaisempaa koulutusta lean-menetelmistä?</p>
+    <div class="options-grid two-col" id="exp-grid"></div>
+    <div class="btn-row">
+      <button class="btn-back" onclick="goTo(1)">← Takaisin</button>
+      <button class="btn-primary" id="btn2" onclick="handleExpNext()" disabled>Eteenpäin →</button>
+    </div>
+  </div>
+
+  <!-- Step 3 -->
+  <div class="step" id="step-3">
+    <div class="step-badge">Vaihe 3 / 4</div>
+    <h2 class="q-title">Korkein suoritettu koulutus</h2>
+    <p class="q-sub">Valitse ylin koulutus, jonka olet suorittanut.</p>
+    <div class="options-grid" id="belt-grid"></div>
+    <div class="btn-row">
+      <button class="btn-back" onclick="goTo(2)">← Takaisin</button>
+      <button class="btn-primary" id="btn3" onclick="goTo(4)" disabled>Eteenpäin →</button>
+    </div>
+  </div>
+
+  <!-- Step 4 -->
+  <div class="step" id="step-4">
+    <div class="step-badge">Vaihe 4 / 4</div>
+    <h2 class="q-title">Suositus on melkein valmis</h2>
+    <p class="q-sub">Täytä yhteystietosi niin saat henkilökohtaisen suosituksen heti.</p>
+    <div class="form-group">
+      <label>Sähköposti *</label>
+      <input type="email" id="email" placeholder="etunimi@yritys.fi" oninput="checkForm()" />
+    </div>
+    <div class="form-group">
+      <label>Nimi / Yritys (valinnainen)</label>
+      <input type="text" id="name" placeholder="Maija Meikäläinen / Yritys Oy" />
+    </div>
+    <div class="form-group">
+      <label>Rooli (valinnainen)</label>
+      <select id="role">
+        <option value="">Valitse...</option>
+        <option>Johto / päättäjä</option>
+        <option>Esimies / tiimipäällikkö</option>
+        <option>Asiantuntija / kehittäjä</option>
+        <option>Yrittäjä</option>
+        <option>Muu</option>
+      </select>
+    </div>
+    <div class="btn-row">
+      <button class="btn-back" onclick="goTo(3)">← Takaisin</button>
+      <button class="btn-primary" id="btn4" onclick="getRecommendation()" disabled>Hae suositus →</button>
+    </div>
+  </div>
+
+  <!-- Result -->
+  <div class="step" id="step-result">
+    <div id="loader-wrap" class="loader-wrap">
+      <div class="loader-ring"></div>
+      <p class="loader-text">AI analysoi vastauksiasi ja valitsee sopivimman koulutuksen...</p>
+    </div>
+    <div id="result-content" style="display:none;">
+      <div class="result-header">
+        <div class="step-badge">Suositus valmis</div>
+        <h2 class="q-title">Tässä on suosituksesi</h2>
+        <p class="q-sub">Perustuen vastauksiisi olemme valinneet sinulle sopivimman koulutuksen.</p>
+      </div>
+      <div class="result-card featured">
+        <div class="result-card-label">Suositeltu koulutus</div>
+        <h3 id="rec-title">–</h3>
+        <p id="rec-text">–</p>
+      </div>
+      <div class="result-card">
+        <div class="result-card-label">Seuraava askel</div>
+        <h3 style="font-size:17px; font-family:'DM Sans',sans-serif; font-weight:500;">Ota yhteyttä tai ilmoittaudu</h3>
+        <p id="rec-next">–</p>
+      </div>
+      <div class="cta-row">
+        <a href="https://www.npi.fi/koulutukset/" target="_blank" class="btn-cta">Tutustu koulutuksiin →</a>
+        <a href="https://www.npi.fi/yhteys/" target="_blank" class="btn-cta-secondary">Ota yhteyttä</a>
+      </div>
+      <p class="email-note">Suositus on lähetetty myös sähköpostiisi. NPI ei jaa tietojasi kolmansille osapuolille.</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const goals = [
+  { id:'cost', label:'Saavuttaa kustannussäästöjä', desc:'Poistaa hukkaa ja tehostaa prosesseja' },
+  { id:'quality', label:'Parantaa tuotteiden tai palveluiden laatua', desc:'Vähentää virheitä ja reklamaatioita' },
+  { id:'process', label:'Tehostaa prosesseja', desc:'Nopeuttaa läpimenoaikoja' },
+  { id:'skills', label:'Kehittää omaa lean-osaamistani', desc:'Sertifikaatti tai urakehitys' },
+  { id:'team', label:'Kouluttaa tiimin tai henkilöstön', desc:'Yhteinen lean-kulttuuri' },
+  { id:'change', label:'Johtaa muutoshanketta', desc:'Projektin tai kehitysohjelman vetäminen' },
+  { id:'tools', label:'Oppia konkreettisia lean-työkaluja', desc:'VSM, Kaizen, DMAIC jne.' },
+  { id:'cert', label:'Saada virallinen sertifikaatti', desc:'Green Belt tai Black Belt' }
+];
+
+const exps = [
+  { id:'yes', label:'Kyllä', desc:'Minulla on aiempaa lean-koulutusta' },
+  { id:'no', label:'Ei', desc:'Aloitan alusta' }
+];
+
+const belts = [
+  { id:'none', label:'Ei aiempaa LSS-koulutusta', desc:'' },
+  { id:'white', label:'White Belt', desc:'Perusteet suoritettu' },
+  { id:'yellow', label:'Yellow Belt', desc:'Yellow Belt suoritettu' },
+  { id:'green', label:'Green Belt', desc:'Green Belt suoritettu' },
+  { id:'black', label:'Black Belt', desc:'Black Belt suoritettu' },
+  { id:'other', label:'Muuta lean-koulutusta', desc:'Esim. Lean Practitioner' }
+];
+
+const state = { goals: new Set(), exp: null, belt: null };
+
+function makeGrid(items, gridId, stateKey, btnId, multi) {
+  const grid = document.getElementById(gridId);
+  items.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'opt-card';
+    card.innerHTML = `<div class="check-dot"></div><p class="opt-label">${item.label}</p>${item.desc ? `<p class="opt-desc">${item.desc}</p>` : ''}`;
+    card.onclick = () => {
+      if (multi) {
+        card.classList.toggle('selected');
+        if (card.classList.contains('selected')) state[stateKey].add(item.id);
+        else state[stateKey].delete(item.id);
+        document.getElementById(btnId).disabled = state[stateKey].size === 0;
+      } else {
+        grid.querySelectorAll('.opt-card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        state[stateKey] = item.id;
+        document.getElementById(btnId).disabled = false;
+      }
+    };
+    grid.appendChild(card);
+  });
+}
+
+makeGrid(goals, 'goals-grid', 'goals', 'btn1', true);
+makeGrid(exps, 'exp-grid', 'exp', 'btn2', false);
+makeGrid(belts, 'belt-grid', 'belt', 'btn3', false);
+
+function handleExpNext() {
+  if (state.exp === 'no') {
+    state.belt = 'none';
+    goTo(4);
+  } else {
+    goTo(3);
+  }
+}
+
+function goTo(step) {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById('step-' + step).classList.add('active');
+  const pct = step === 'result' ? 100 : (step / 4) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function checkForm() {
+  const v = document.getElementById('email').value;
+  document.getElementById('btn4').disabled = !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+}
+
+async function getRecommendation() {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById('step-result').classList.add('active');
+  document.getElementById('loader-wrap').style.display = 'block';
+  document.getElementById('result-content').style.display = 'none';
+  document.getElementById('progress-fill').style.width = '100%';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  const goalLabels = [...state.goals].map(id => goals.find(g => g.id === id)?.label).join(', ');
+  const beltLabel = belts.find(b => b.id === state.belt)?.label || 'ei aiempaa';
+  const role = document.getElementById('role').value;
+
+  const prompt = `Olet NPI:n (Nordic Process Improvement Oy) koulutusasiantuntija. Suosittele sopivinta koulutusta.
+
+NPI:n koulutukset:
+- White Belt: koko henkilöstön perustietoisuus leanista, lyhyt koulutus
+- Yellow Belt: tiimien ja esimiesten käytännön lean-työkalu-osaaminen
+- Lean-koulutus: lean-menetelmien yleiskoulutus ilman sertifikaattia
+- Lean Six Sigma -koulutus: perustason LSS, sopii kehitystyöhön osallistuville
+- Green Belt: projektin vetäjille, DMAIC-menetelmä, sertifikaatti
+- Black Belt: eksperteille ja konsulteille, syvä LSS-osaaminen, sertifikaatti
+- Design for Six Sigma: tuotekehityksen ja palvelusuunnittelun ammattilaisille
+
+Vastaajan profiili:
+- Tavoitteet: ${goalLabels}
+- Aiempi lean-kokemus: ${state.exp === 'yes' ? 'kyllä' : 'ei'}
+- Korkein suoritettu koulutus: ${beltLabel}
+- Rooli: ${role || 'ei ilmoitettu'}
+
+Vastaa VAIN JSON-muodossa ilman muuta tekstiä, markdown-koodiblokkia tai selittelyjä:
+{"title": "Koulutuksen nimi", "text": "2-3 lausetta miksi tämä koulutus sopii juuri tälle henkilölle, henkilökohtaisesti ja konkreettisesti.", "next": "Konkreettinen seuraava askel"}`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 400,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await res.json();
+    const raw = data.content?.[0]?.text || '{}';
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const rec = JSON.parse(clean);
+    document.getElementById('rec-title').textContent = rec.title || 'Lean Six Sigma -koulutus';
+    document.getElementById('rec-text').textContent = rec.text || '';
+    document.getElementById('rec-next').textContent = rec.next || 'Ota yhteyttä NPI:hin: info@npi.fi tai puh. 09 xxx xxxx.';
+  } catch(e) {
+    document.getElementById('rec-title').textContent = 'Green Belt -koulutus';
+    document.getElementById('rec-text').textContent = 'Vastaustesi perusteella Green Belt -koulutus sopii sinulle hyvin. Koulutuksessa opit DMAIC-menetelmän ja saat kansainvälisesti tunnustetun sertifikaatin.';
+    document.getElementById('rec-next').textContent = 'Ota yhteyttä NPI:hin: info@npi.fi';
+  }
+
+  document.getElementById('loader-wrap').style.display = 'none';
+  document.getElementById('result-content').style.display = 'block';
+}
+</script>
+</body>
+</html>
